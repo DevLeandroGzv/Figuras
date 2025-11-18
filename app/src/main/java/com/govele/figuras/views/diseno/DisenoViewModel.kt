@@ -77,30 +77,39 @@ class DisenoViewModel @Inject constructor(
         if (index in updatedPoints.indices) {
             updatedPoints[index] = newPoint
             val updatedFigura = currentFigura.copy(puntos = updatedPoints)
+            updatedFigura.puntos.forEachIndexed { i, punto ->
+                println("🔄   Punto $i: (${punto.x}, ${punto.y})")
+            }
             _state.update { it.copy(figura = updatedFigura) }
         }
     }
 
     fun saveFigura() {
         viewModelScope.launch {
-            val figura = _state.value.figura
-            println("💾 GUARDANDO FIGURA: ${figura?.nombre}")
-            println("💾 PUNTOS: ${figura?.puntos}")
+            val currentFigura = _state.value.figura ?: return@launch
 
-            if (figura != null) {
-                try {
-                    saveFiguraUseCase(figura)
-                    println("✅ FIGURA GUARDADA EXITOSAMENTE")
-
-                    // Marcar como última figura usada
-                    setFiguraAsUltimaUseCase(figura.id.toInt())
-
-                    _state.update { it.copy(isSaved = true) }
-                } catch (e: Exception) {
-                    println("❌ ERROR GUARDANDO: ${e.message}")
-                }
+            val figuraParaGuardar = if (!currentFigura.esCustom) {
+                currentFigura.copy(
+                    id = "custom_${System.currentTimeMillis()}",
+                    nombre = "${currentFigura.nombre} (Modificada)",
+                    esCustom = true
+                )
             } else {
-                println("❌ NO HAY FIGURA PARA GUARDAR")
+                currentFigura
+            }
+
+            try {
+                saveFiguraUseCase(figuraParaGuardar)
+                println("✅ FIGURA GUARDADA EXITOSAMENTE")
+
+                _state.update { it.copy(figura = figuraParaGuardar, isSaved = true) }
+
+                figuraParaGuardar.id.toIntOrNull()?.let { id ->
+                    setFiguraAsUltimaUseCase(id)
+                }
+
+            } catch (e: Exception) {
+                println("❌ ERROR GUARDANDO: ${e.message}")
             }
         }
     }
