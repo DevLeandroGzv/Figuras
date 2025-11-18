@@ -1,17 +1,14 @@
-// di/Modules.kt
 package com.govele.figuras.di
 
+
 import android.content.Context
+import com.govele.figuras.data.local.database.AppDatabase
 import com.govele.figuras.data.datasource.local.LocalDataSource
 import com.govele.figuras.data.datasource.remote.RemoteDataSource
-import com.govele.figuras.data.local.database.AppDatabase
 import com.govele.figuras.data.remote.api.FiguraApiService
-//import com.govele.figuras.data.datasource.local.LocalDataSource
-//import com.govele.figuras.data.datasource.remote.RemoteDataSource
-//import com.govele.figuras.data.remote.api.FiguraApiService
-//import com.govele.figuras.data.repository.impl.FiguraRepositoryImpl
-//import com.govele.figuras.domain.repository.FiguraRepository
-//import com.govele.figuras.domain.usecase.*
+import com.govele.figuras.data.repository.impl.FiguraRepositoryImpl
+import com.govele.figuras.domain.repository.FiguraRepository
+import com.govele.figuras.domain.usecase.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -84,5 +81,11 @@ object AppModule {
     @Singleton
     fun provideGetUltimaFiguraUseCase(repository: FiguraRepository): GetUltimaFiguraUseCase {
         return GetUltimaFiguraUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSetFiguraAsUltimaUseCase(repository: FiguraRepository): SetFiguraAsUltimaUseCase {
+        return SetFiguraAsUltimaUseCase(repository)
     }
 }

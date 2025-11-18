@@ -1,7 +1,13 @@
 package com.govele.figuras.domain.model
 
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
 
+
+data class Punto(
+    val x: Float,
+    val y: Float
+)
 
 data class Figura(
     val id: String,
@@ -14,7 +20,7 @@ data class Figura(
     companion object {
         private val gson = Gson()
 
-        fun puntosToJson(puntos: List<Punto>): String {
+        fun puntosToJson(puntos: Flow<R>): String {
             return gson.toJson(puntos)
         }
 
