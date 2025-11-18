@@ -6,12 +6,14 @@ import com.govele.figuras.data.datasource.local.LocalDataSource
 import com.govele.figuras.data.datasource.remote.RemoteDataSource
 import com.govele.figuras.data.local.database.AppDatabase
 import com.govele.figuras.data.remote.api.FiguraApiService
-//import com.govele.figuras.data.datasource.local.LocalDataSource
-//import com.govele.figuras.data.datasource.remote.RemoteDataSource
-//import com.govele.figuras.data.remote.api.FiguraApiService
-//import com.govele.figuras.data.repository.impl.FiguraRepositoryImpl
-//import com.govele.figuras.domain.repository.FiguraRepository
-//import com.govele.figuras.domain.usecase.*
+import com.govele.figuras.data.repository.impl.FiguraRepositoryImpl
+import com.govele.figuras.domain.repository.FiguraRepository
+import com.govele.figuras.domain.usecase.GetFigurasPredisenadasUseCase
+import com.govele.figuras.domain.usecase.GetUltimaFiguraUseCase
+import com.govele.figuras.domain.usecase.SaveFiguraUseCase
+import com.govele.figuras.domain.usecases.GetFiguraByIdUseCase
+import com.govele.figuras.domain.usecases.GetFigurasPersonalizadasUseCase
+import com.govele.figuras.domain.usecases.RefreshFigurasUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,24 +35,23 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFiguraApiService(): FiguraApiService {
+    fun providesRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl("https://gca.traces.com.co/pruebamovil/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(FiguraApiService::class.java)
     }
+
+
+    @Provides
+    @Singleton
+    fun provideFiguraApiService(retrofit: Retrofit): FiguraApiService =
+        retrofit.create(FiguraApiService::class.java)
 
     @Provides
     @Singleton
     fun provideLocalDataSource(appDatabase: AppDatabase): LocalDataSource {
         return LocalDataSource(appDatabase.figuraDao())
-    }
-
-    @Provides
-    @Singleton
-    fun provideRemoteDataSource(apiService: FiguraApiService): RemoteDataSource {
-        return RemoteDataSource(apiService)
     }
 
     @Provides
@@ -84,5 +85,17 @@ object AppModule {
     @Singleton
     fun provideGetUltimaFiguraUseCase(repository: FiguraRepository): GetUltimaFiguraUseCase {
         return GetUltimaFiguraUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFiguraByIdUseCase(repository: FiguraRepository): GetFiguraByIdUseCase {
+        return GetFiguraByIdUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetFigurasPersonalizadasUseCase(repository: FiguraRepository): GetFigurasPersonalizadasUseCase {
+        return GetFigurasPersonalizadasUseCase(repository)
     }
 }

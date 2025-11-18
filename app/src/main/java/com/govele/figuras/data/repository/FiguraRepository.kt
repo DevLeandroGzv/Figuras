@@ -1,4 +1,3 @@
-// domain/repository/FiguraRepository.kt
 package com.govele.figuras.domain.repository
 
 import com.govele.figuras.domain.model.Figura
@@ -12,4 +11,5 @@ interface FiguraRepository {
     suspend fun refreshFiguras()
     suspend fun getUltimaFigura(): Figura?
     suspend fun setFiguraAsUltima(id: Int)
+
 }

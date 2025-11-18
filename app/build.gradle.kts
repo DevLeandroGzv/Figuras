@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.govele.figuras"
-        minSdk = 24
+        minSdk = 22
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -69,7 +69,6 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // Dagger Hilt

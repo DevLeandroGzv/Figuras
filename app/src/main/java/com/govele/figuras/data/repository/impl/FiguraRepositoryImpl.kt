@@ -35,8 +35,18 @@ class FiguraRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveFigura(figura: Figura) {
-        localDataSource.insertFigura(figura.toEntity())
+        println("💾 REPOSITORY: Guardando figura ${figura.nombre}")
+        println("💾 REPOSITORY: Puntos: ${figura.puntos}")
+        println("💾 REPOSITORY: esCustom: ${figura.esCustom}")
+
+        val entity = figura.toEntity()
+        println("💾 REPOSITORY: Entity ID: ${entity.id}")
+        println("💾 REPOSITORY: Entity puntosJson: ${entity.puntosJson}")
+
+        localDataSource.insertFigura(entity)
+        println("✅ REPOSITORY: Figura guardada en BD")
     }
+
 
     override suspend fun refreshFiguras() {
         try {
@@ -48,7 +58,7 @@ class FiguraRepositoryImpl @Inject constructor(
                     puntosJson = Figura.puntosToJson(
                         apiFigura.puntos.map { apiPunto ->
                             Punto(apiPunto.x, apiPunto.y)
-                        } as Flow<R>
+                        }
                     ),
                     escala = 1.0f,
                     esCustom = false

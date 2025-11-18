@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.govele.figuras.domain.model.Figura
@@ -23,6 +24,7 @@ fun SeleccionScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+
         Text(
             text = "Seleccionar Figura",
             style = MaterialTheme.typography.headlineMedium,
@@ -34,24 +36,14 @@ fun SeleccionScreen(
             onLadosChange = { lados -> viewModel.generatePolygon(lados) }
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         ScaleControl(
             escala = state.escala,
             onEscalaChange = { escala -> viewModel.updateScale(escala) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        FigurasList(
-            figuras = state.figuras,
-            figuraSeleccionada = state.selectedFigura,
-            onFiguraSeleccionada = { figura -> viewModel.selectFigura(figura) },
-            isLoading = state.isLoading,
-            error = state.error,
-            onErrorDismiss = { viewModel.clearError() }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
         Button(
             onClick = {
                 viewModel.getSelectedFiguraWithScale()?.let { figura ->
@@ -65,6 +57,26 @@ fun SeleccionScreen(
         ) {
             Text("Continuar al Diseño")
         }
+        FigurasList(
+            figuras = state.figuras,
+            figuraSeleccionada = state.selectedFigura,
+            onFiguraSeleccionada = { figura -> viewModel.selectFigura(figura) },
+            isLoading = state.isLoading
+        )
+        if (state.figurasPersonalizadas.isNotEmpty()) {
+            Text(
+                text = "Mis Figuras Guardadas",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+            FigurasList(
+                figuras = state.figurasPersonalizadas,
+                figuraSeleccionada = state.selectedFigura,
+                onFiguraSeleccionada = { figura -> viewModel.selectFigura(figura) },
+                isLoading = state.isLoading
+
+            )
+        }
     }
 }
 
@@ -75,24 +87,18 @@ private fun PolygonControls(
 ) {
     var ladosInput by remember { mutableStateOf(lados.toString()) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Generar Polígono",
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = ladosInput,
                     onValueChange = { ladosInput = it },
-                    label = { Text("Lados") },
+                    label = { Text("Lados (3-12)") },
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -101,6 +107,8 @@ private fun PolygonControls(
                         val ladosValue = ladosInput.toIntOrNull() ?: 3
                         if (ladosValue in 3..12) {
                             onLadosChange(ladosValue)
+                        } else {
+                            ladosInput = "3"
                         }
                     }
                 ) {
@@ -116,12 +124,8 @@ private fun ScaleControl(
     escala: Float,
     onEscalaChange: (Float) -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = "Escala: ${"%.2f".format(escala)}",
                 style = MaterialTheme.typography.titleMedium
@@ -142,37 +146,18 @@ private fun FigurasList(
     figuras: List<Figura>,
     figuraSeleccionada: Figura?,
     onFiguraSeleccionada: (Figura) -> Unit,
-    isLoading: Boolean,
-    error: String?,
-    onErrorDismiss: () -> Unit
+    isLoading: Boolean
 ) {
-    Card(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+    Card(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "Figuras Prediseñadas",
+                text = "Figuras Disponibles",
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
 
             if (isLoading) {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            }
-
-            error?.let {
-                AlertDialog(
-                    onDismissRequest = onErrorDismiss,
-                    title = { Text("Error") },
-                    text = { Text(it) },
-                    confirmButton = {
-                        Button(onClick = onErrorDismiss) {
-                            Text("OK")
-                        }
-                    }
-                )
             }
 
             LazyColumn(
@@ -183,7 +168,9 @@ private fun FigurasList(
                     FiguraItem(
                         figura = figura,
                         isSelected = figura.id == figuraSeleccionada?.id,
-                        onClick = { onFiguraSeleccionada(figura) }
+                        onClick = {
+                            onFiguraSeleccionada(figura)
+                        }
                     )
                 }
             }
@@ -198,7 +185,9 @@ private fun FiguraItem(
     onClick: () -> Unit
 ) {
     Card(
-        onClick = onClick,
+        onClick = {
+            onClick()
+        },
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) {
@@ -208,9 +197,7 @@ private fun FiguraItem(
             }
         )
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = figura.nombre,
                 style = MaterialTheme.typography.titleSmall

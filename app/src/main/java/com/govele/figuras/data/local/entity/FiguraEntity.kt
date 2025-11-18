@@ -1,8 +1,10 @@
 package com.govele.figuras.data.local.entity
 
+import android.R
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.govele.figuras.domain.model.Figura
+import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "figuras")
 data class FiguraEntity(

@@ -5,9 +5,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.govele.figuras.domain.model.Figura
 import com.govele.figuras.views.diseno.DisenoScreen
 import com.govele.figuras.views.seleccion.SeleccionScreen
@@ -20,7 +22,6 @@ sealed class Destination(val route: String) {
             if (figura != null) "diseno?figura=${figura}" else "diseno"
     }
 }
-
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
@@ -35,13 +36,20 @@ fun AppNavHost(
         composable(Destination.Seleccion.route) {
             SeleccionScreen(
                 onNavigateToDiseno = { figura ->
-                    navController.navigate(Destination.Diseno.createRoute(figura))
+                    navController.navigate("diseno/${figura.id}") {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
 
-        composable(Destination.Diseno.route) {
+        composable(
+            route = "diseno/{figuraId}",
+            arguments = listOf(navArgument("figuraId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val figuraId = backStackEntry.arguments?.getString("figuraId")?.toIntOrNull()
             DisenoScreen(
+                figuraId = figuraId ,
                 onBack = { navController.popBackStack() }
             )
         }

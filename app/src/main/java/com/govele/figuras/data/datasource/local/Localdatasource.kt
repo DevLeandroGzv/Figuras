@@ -21,7 +21,12 @@ class LocalDataSource @Inject constructor(
     }
 
     suspend fun insertFigura(figura: FiguraEntity) {
+        println("💾 DATASOURCE: Insertando figura ID: ${figura.id}")
+        println("💾 DATASOURCE: Nombre: ${figura.nombre}")
+        println("💾 DATASOURCE: Puntos JSON: ${figura.puntosJson}")
+
         figuraDao.insertFigura(figura)
+        println("✅ DATASOURCE: Figura insertada en DAO")
     }
 
     suspend fun insertAllFiguras(figuras: List<FiguraEntity>) {
