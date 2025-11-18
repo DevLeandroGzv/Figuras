@@ -35,7 +35,6 @@ class DisenoViewModel @Inject constructor(
     val state: StateFlow<DisenoState> = _state.asStateFlow()
 
     fun setFigura(figura: Figura) {
-        // Asegurar que sea custom y tenga ID único
         val figuraCustom = figura.copy(
             esCustom = true,
             id = "custom_${System.currentTimeMillis()}" // ID único
@@ -89,6 +88,7 @@ class DisenoViewModel @Inject constructor(
             val currentFigura = _state.value.figura ?: return@launch
 
             val figuraParaGuardar = if (!currentFigura.esCustom) {
+                println("🔄 Convirtiendo figura prediseñada a personalizada")
                 currentFigura.copy(
                     id = "custom_${System.currentTimeMillis()}",
                     nombre = "${currentFigura.nombre} (Modificada)",
@@ -97,6 +97,12 @@ class DisenoViewModel @Inject constructor(
             } else {
                 currentFigura
             }
+
+            println("💾 GUARDANDO FIGURA:")
+            println("💾 ID: ${figuraParaGuardar.id}")
+            println("💾 Nombre: ${figuraParaGuardar.nombre}")
+            println("💾 esCustom: ${figuraParaGuardar.esCustom}")
+            println("💾 Puntos: ${figuraParaGuardar.puntos}")
 
             try {
                 saveFiguraUseCase(figuraParaGuardar)

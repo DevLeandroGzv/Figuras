@@ -57,26 +57,14 @@ fun SeleccionScreen(
         ) {
             Text("Continuar al Diseño")
         }
+        Spacer(modifier = Modifier.height(10.dp))
         FigurasList(
             figuras = state.figuras,
             figuraSeleccionada = state.selectedFigura,
             onFiguraSeleccionada = { figura -> viewModel.selectFigura(figura) },
             isLoading = state.isLoading
         )
-        if (state.figurasPersonalizadas.isNotEmpty()) {
-            Text(
-                text = "Mis Figuras Guardadas",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-            FigurasList(
-                figuras = state.figurasPersonalizadas,
-                figuraSeleccionada = state.selectedFigura,
-                onFiguraSeleccionada = { figura -> viewModel.selectFigura(figura) },
-                isLoading = state.isLoading
 
-            )
-        }
     }
 }
 
